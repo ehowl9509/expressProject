@@ -1,4 +1,4 @@
-const models = require('../../models');
+const models = require('../../../models');
 
 exports.get_products = ( _ , res) => {
     models.Products.findAll({
@@ -25,7 +25,7 @@ exports.post_products_write = ( req , res ) => {
 
 exports.get_products_detail = ( req , res ) => {
     models.Products.findByPk(req.params.id).then( (product) => {
-        res.render('admin/detail.html', { product: product });  
+        res.render('admin/detail.html', { product: product });
     });
 };
 
