@@ -1,26 +1,17 @@
 const models = require('../../../models');
 
-exports.get_products = ( _ , res) => {
-    models.Products.findAll({
-
-    }).then( (products) => {
-        // DB에서 받은 products를 products변수명으로 내보냄
+exports.get_products = async ( _ , res) => {
+        const products = await models.Products.findAll()
         res.render( 'admin/products.html' ,{ products : products });
-    });
 }
 
-exports.get_products_write = ( _ , res) => {
+exports.get_products_write = ( _ , res) => {            /*async , await 사용시 then 사용 안해도 가능하며 */
     res.render( 'admin/write.html');
 }
 
-exports.post_products_write = ( req , res ) => {
-    models.Products.create({
-        name : req.body.name,
-        price : req.body.price ,
-        description : req.body.description
-    }).then( () => {
+exports.post_products_write = async ( req , res ) => {
+        await models.Products.create(req.body)
         res.redirect('/admin/products');
-    });
 }
 
 exports.get_products_detail = ( req , res ) => {

@@ -2,7 +2,7 @@ const express = require('express');
 const nunjucks = require('nunjucks');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-
+const  passport = require('passport');
 // db 관련
 const db = require('./models');
 
@@ -36,6 +36,9 @@ class App {
         // 에러처리
         this.errorHandler();
 
+        //passport 셋팅
+        this.setPassport();
+
 
     }
 
@@ -44,7 +47,7 @@ class App {
         db.sequelize.authenticate()
         .then(() => {
             console.log('Connection has been established successfully.');
-            //return db.sequelize.sync();
+            return db.sequelize.sync();
         })
         .then(() => {
             console.log('DB Sync complete.');
@@ -105,6 +108,11 @@ class App {
             res.status(500).render('common/500.html')
         });
     
+    }
+
+    setPassport(){
+        this.app.use(passport.initialize());
+        this.app.use(passport.session());
     }
 
 }
