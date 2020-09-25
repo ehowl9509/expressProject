@@ -1,18 +1,20 @@
-const express = require('express');
 const passport = require('passport'); //passport 추가
-const router = express.Router();
+const { Router } = require('express');
+const router = Router();
 var NaverStrategy = require('passport-naver').Strategy;
+const models = require('../../models');
+const ctrl = require('./login.ctrl');
 
+router.get('/view', ctrl.get_loginView);
 
-/* naver 로그인 연동
- *
- */
-router.get('/naver',passport.authenticate('naver',null),function(req, res) {
-    console.log("/main/naver");
-});
+// naver 로그인
+router.get('/naver',
+    passport.authenticate('naver')
+);
 
 //처리 후 callback 처리 부분 성공/실패 시 리다이렉트 설정
-router.get('/naver/callback', passport.authenticate('naver', {
+router.get('/naver/callback',
+    passport.authenticate('naver', {
         successRedirect: '/',
         failureRedirect: '/login/naver'
     })
@@ -20,37 +22,37 @@ router.get('/naver/callback', passport.authenticate('naver', {
 
 passport.use(new NaverStrategy({
         clientID: 'q38FNiPzdFN0OdjnSZvt',
-        clientSecret: 'bTEBWlZkz4',
-        callbackURL: 'http://localhost:3000/admin/products'
+        callbackURL: '/admin/products'
     },
     function (accessToken, refreshToken, profile, done) {
-        var _profile = profile._json;
-
-        loginByThirdparty({
+        console.log("@@@@@@@"+profile);
+        models.Users.create({
+            naver : profile.nickname,
+            email : profile.email
+        });
+        var info = {
             'auth_type': 'naver',
-            'auth_id': _profile.id,
-            'auth_name': _profile.nickname,
-            'auth_email': _profile.email
-        }, done);
+            'auth_id': profile.id,
+            'auth_name': profile.nickname,
+            'auth_email': profile.email
+        };
+        loginByThirdparty(info, done);
     }
 ));
 
+passport.serializeUser(function(info, done) {
+    done(null, info);
+});
+passport.deserializeUser(function(info, done) {
+    done(null, info);
 
-//failed to serialize user into session 에러 발생 시 아래의 내용을 추가 한다.
-passport.serializeUser(function(user, done) {
-    done(null, user);
 });
 
-passport.deserializeUser(function(req, user, done) {
-
-    // passport로 로그인 처리 후 해당 정보를 session에 담는다.
-    req.session.sid = user.name;
-    console.log("Session Check :" +req.session.sid);
-    done(null, user);
-});
 function loginByThirdparty(info, done) {
-    console.log(info.auth_type);
+
+    done(null, info);
 }
+
 
 module.exports = router;
 
