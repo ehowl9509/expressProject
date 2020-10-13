@@ -1,58 +1,49 @@
 const passport = require('passport'); //passport 추가
 const { Router } = require('express');
 const router = Router();
-var NaverStrategy = require('passport-naver').Strategy;
 const models = require('../../models');
-const ctrl = require('./login.ctrl');
+const nodemailer = require('nodemailer');
+const ctrl = require('./join.ctrl');
 
 router.get('/view', ctrl.get_loginView);
 
-// naver 로그인
-router.get('/naver',
-    passport.authenticate('naver')
-);
+router.post("/nodemailerTest", function(req, res, next){
 
-//처리 후 callback 처리 부분 성공/실패 시 리다이렉트 설정
-router.get('/naver/callback',
-    passport.authenticate('naver', {
-        successRedirect: '/',
-        failureRedirect: '/login/naver'
-    })
-);
+    let email = req.body.email;
+    let password = req.body.password;
 
-passport.use(new NaverStrategy({
-        clientID: 'q38FNiPzdFN0OdjnSZvt',
-        callbackURL: '/admin/products'
-    },
-    function (accessToken, refreshToken, profile, done) {
-        console.log("@@@@@@@"+profile);
-        models.Users.create({
-            naver : profile.nickname,
-            email : profile.email
-        });
-        var info = {
-            'auth_type': 'naver',
-            'auth_id': profile.id,
-            'auth_name': profile.nickname,
-            'auth_email': profile.email
-        };
-        loginByThirdparty(info, done);
-    }
-));
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'dksdlsrb10@gmail.com',  // gmail 계정 아이디를 입력
+            pass: '!dusqhd1djr'          // gmail 계정의 비밀번호를 입력
+        }
+    });
 
-passport.serializeUser(function(info, done) {
-    done(null, info);
-});
-passport.deserializeUser(function(info, done) {
-    done(null, info);
+    let mailOptions = {
+        from: 'dksdlsrb10@gmail.com',    // 발송 메일 주소 (위에서 작성한 gmail 계정 아이디)
+        to: email ,                     // 수신 메일 주소
+        subject: '[Node.js]인증 메일이 도착했습니다.',   // 제목
+        html: '<p>아래의 링크를 클릭해주세요 !</p>' +
+            "<a href='http://localhost:3000/join/auth/?email="+ email +"&password="+ password +"'>인증하기</a>"
+    };
 
-});
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        }
+        else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+    res.redirect("/join/View");
 
-function loginByThirdparty(info, done) {
+})
 
-    done(null, info);
-}
-
+router.post("/auth", function(req, res, next){
+    console.log(req.query.email);
+    console.log(req.query.password)
+})
 
 module.exports = router;
 
