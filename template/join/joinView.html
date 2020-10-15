@@ -20,7 +20,7 @@
         <div class="container">
             <div class="z-depth-1 grey lighten-4 row" style="display: inline-block; padding: 32px 48px 0px 48px; border: 1px solid #EEE;">
 
-                <form class="col s12" action="/join/nodemailerTest" method="post">
+                <form class="col s12" action="/join/nodemailerTest" method="post" id="joinForm">
                     <div class='row'>
                         <div class='col s12'>
                         </div>
@@ -29,24 +29,30 @@
                     <div class='row'>
                         <div class='input-field col s12'>
                             <input class='validate' type='email' name='email' id='email' />
-                            <label for='email'>Enter your email</label>
+                            <label for='email'>이메일</label>
                         </div>
                     </div>
 
                     <div class='row'>
                         <div class='input-field col s12'>
                             <input class='validate' type='password' name='password' id='password' />
-                            <label for='password'>Enter your password</label>
+                            <label for='password'>비밀번호</label>
                         </div>
-                        <label style='float: right;'>
-                            <a class='pink-text' href='#!'><b>Forgot Password?</b></a>
-                        </label>
+                    </div>
+                    <div class='row'>
+                            <div class='input-field col s12'>
+                                <input class='validate' type='text' name='phoneNum' id='phoneNum' />
+                                <label for='phoneNum'>전화번호</label>
+                            </div>
+                        <!--<label style='float: right;'>-->
+                        <!--<a class='pink-text' href='#!'><b>Forgot Password?</b></a>-->
+                        <!--</label>-->
                     </div>
 
                     <br />
                     <center>
                         <div class='row'>
-                            <button type='submit' name='btn_login' id='btn_join' class='col s12 btn btn-large waves-effect indigo'>회원가입</button>
+                            <button type='button' name='btn_join' id='btn_join' class='col s12 btn btn-large waves-effect indigo'>회원가입</button>
                         </div>
                     </center>
                 </form>
@@ -60,8 +66,48 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script>
 
+    $(document).ready(function() {
+
+    });
+
+    $("#btn_join").click(function(){
+        var email = isEmail ( $("#email").val() );
+        var password = isValidFormPassword ( $("#password").val() );
+        if($("#email").val()=="") {
+            alert("이메일을 입력해주세요.");
+            return false;
+        }else if( $("#password").val()=="" ){
+            alert("비밀번호를 입력해주세요");
+            return false;
+        }else if(!email) {
+            alert("이메일 형식에 맞게 작성하세요");
+        }else if(!password){
+            alert("비밀번호는 6~16자, 영문, 숫자, 특수문자의 조합으로 입력해주세요");
+        }else{
+            alert("인증 메일이 전송되었습니다.")
+            $("#joinForm").submit();
+        }
+    });
+
+    //이메일 정규식 체크
+    function isEmail(asValue) {
+        var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+        return regExp.test(asValue);
+
+    }
+
+    //비밀번호 정규식 체크
+    function isValidFormPassword(pw) {
+        var check = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{6,16}$/;
+
+        if (!check.test(pw)) {
+            return false;
+        }
+        return true;
+    }
 
 </script>
 </body>

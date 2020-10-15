@@ -7,10 +7,11 @@ const ctrl = require('./join.ctrl');
 
 router.get('/view', ctrl.get_loginView);
 
-router.post("/nodemailerTest", function(req, res, next){
+router.post("/nodemailerTest", (req, res, next) => {
 
     let email = req.body.email;
     let password = req.body.password;
+    let phoneNum = req.body.phoneNum;
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -25,7 +26,7 @@ router.post("/nodemailerTest", function(req, res, next){
         to: email ,                     // 수신 메일 주소
         subject: '[Node.js]인증 메일이 도착했습니다.',   // 제목
         html: '<p>아래의 링크를 클릭해주세요 !</p>' +
-            "<a href='http://localhost:3000/join/auth/?email="+ email +"&password="+ password +"'>인증하기</a>"
+            "<a href='http://localhost:3000/join/auth?email="+ email +"&password="+ password +"&phoneNum="+ phoneNum +"'>인증하기</a>"
     };
 
     transporter.sendMail(mailOptions, function(error, info){
@@ -40,10 +41,27 @@ router.post("/nodemailerTest", function(req, res, next){
 
 })
 
-router.post("/auth", function(req, res, next){
-    console.log(req.query.email);
-    console.log(req.query.password)
-})
+router.get("/auth", (req, res, next) => {
+
+    let email = req.query.email;
+
+    let password = req.query.password;
+
+    if(!email  && !password){
+        res.render('login/loginView.html');
+        return false;
+    }
+
+    models.User.create({
+        email: email,
+        password: password
+    }).then( (result ) => {
+        res.render('login/loginView.html', {result:"success", email:email})
+        console.log("success");
+    }).catch((error) => {
+        console.log("error" + error);
+    })
+});
 
 module.exports = router;
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon --delay 2.5 js,html server.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
