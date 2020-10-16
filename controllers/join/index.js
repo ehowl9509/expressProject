@@ -16,8 +16,8 @@ router.post("/nodemailerTest", (req, res, next) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'dksdlsrb10@gmail.com',  // gmail 계정 아이디를 입력
-            pass: '!dusqhd1djr'          // gmail 계정의 비밀번호를 입력
+            user: '',  // gmail 계정 아이디를 입력
+            pass: ''          // gmail 계정의 비밀번호를 입력
         }
     });
 

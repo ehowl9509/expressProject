@@ -2,9 +2,11 @@ const express = require('express');
 const nunjucks = require('nunjucks');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const  passport = require('passport');
+const passport = require('passport')
+const session = require('express-session');
 // db 관련
 const db = require('./models');
+
 
 
 class App {
@@ -39,6 +41,7 @@ class App {
         //passport 셋팅
         this.setPassport();
 
+        this.setSession();
 
     }
 
@@ -64,6 +67,7 @@ class App {
         this.app.use(logger('dev'));
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: false }));
+        console.log("mid")
 
     }
 
@@ -72,6 +76,7 @@ class App {
         nunjucks.configure('template', {
             autoescape: true,
             express: this.app
+
         });
 
     }
@@ -110,11 +115,25 @@ class App {
     
     }
 
+    setSession(){
+        this.app.use(session({
+            secret :"#JDKLF439jsdlfsjl",
+            resave:true,
+            saveUninitialized:true,
+            cookie:{
+                httpOnly:true,
+                maxAge :30
+            }
+        }));
+    }
+
     setPassport(){
-        this.app.use(passport.initialize());
-        this.app.use(passport.session());
+        this.app.use(passport.initialize())
+        this.app.use(passport.session())
     }
 
 }
+console.log("123");
+
 
 module.exports = new App().app;

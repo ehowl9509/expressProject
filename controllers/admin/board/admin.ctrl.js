@@ -3,6 +3,7 @@ const models = require('../../../models');
 exports.get_products = async ( _ , res) => {
         const products = await models.Products.findAll()
         res.render( 'admin/products.html' ,{ products : products });
+        console.log(products);
 }
 
 exports.get_products_write = ( _ , res) => {            /*async , await 사용시 then 사용 안해도 가능하며 */

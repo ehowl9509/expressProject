@@ -1,58 +1,54 @@
-const passport = require('passport'); //passport 추가
+const passport = require('passport')
+    , LocalStrategy = require('passport-local').Strategy;
 const { Router } = require('express');
 const router = Router();
-var NaverStrategy = require('passport-naver').Strategy;
-const models = require('../../models');
 const ctrl = require('./login.ctrl');
+const models = require('../../models');
+router.use(passport.initialize());
+router.use(passport.session());
 
 router.get('/view', ctrl.get_loginView);
 
-// naver 로그인
-router.get('/naver',
-    passport.authenticate('naver')
-);
+//Session 관리
+passport.serializeUser(function(user, done) {
+    console.log("@@@@@@"+user.id);
+    done(null, user.id);
 
-//처리 후 callback 처리 부분 성공/실패 시 리다이렉트 설정
-router.get('/naver/callback',
-    passport.authenticate('naver', {
-        successRedirect: '/',
-        failureRedirect: '/login/naver'
-    })
-);
+});
+passport.deserializeUser(function(id, done) {
+    console.log(id);
+    done(null, id);
+});
 
-passport.use(new NaverStrategy({
-        clientID: 'q38FNiPzdFN0OdjnSZvt',
-        callbackURL: '/admin/products'
+//LocalStrategy
+passport.use(new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password'
     },
-    function (accessToken, refreshToken, profile, done) {
-        console.log("@@@@@@@"+profile);
-        models.Users.create({
-            naver : profile.nickname,
-            email : profile.email
-        });
-        var info = {
-            'auth_type': 'naver',
-            'auth_id': profile.id,
-            'auth_name': profile.nickname,
-            'auth_email': profile.email
+    async function(email, password, done) {
+    const userInfo = await models.User.findOne({
+        where : {email: email}
+    });
+        const user = {
+            id : userInfo.email,
+            pw : userInfo.password
         };
-        loginByThirdparty(info, done);
+        if(email===user.id && password===userInfo.pw){
+            console.log("seccess");
+            done(null, user);
+        }else{
+            console.log("fail");
+        }
+
     }
 ));
 
-passport.serializeUser(function(info, done) {
-    done(null, info);
-});
-passport.deserializeUser(function(info, done) {
-    done(null, info);
-
-});
-
-function loginByThirdparty(info, done) {
-
-    done(null, info);
-}
-
+//로그인 성공과 실패 시 Routing
+router.post('/login', passport.authenticate('local', {
+        successRedirect: '/test',
+        failureRedirect: '/login'
+    })
+);
 
 module.exports = router;
 
